@@ -536,6 +536,7 @@ const ERROR_WILDCARDS: &str = "wildcards are either regular `*` or recursive `**
 const ERROR_RECURSIVE_WILDCARDS: &str = "recursive wildcards must form a single path \
                                          component";
 const ERROR_INVALID_RANGE: &str = "invalid range pattern";
+const ERROR_INVALID_ESCAPE_SEQUENCE: &str = "invalid escape sequence";
 
 impl Pattern {
     /// This function compiles Unix shell style patterns.
@@ -639,6 +640,17 @@ impl Pattern {
                         pos: i,
                         msg: ERROR_INVALID_RANGE,
                     });
+                }
+                '\\' => {
+                    if let Some(&c) = chars.get(i + 1) {
+                        tokens.push(Char(c));
+                    } else {
+                        return Err(PatternError {
+                            pos: i,
+                            msg: ERROR_INVALID_ESCAPE_SEQUENCE,
+                        });
+                    }
+                    i += 2;
                 }
                 c => {
                     tokens.push(Char(c));

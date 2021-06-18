@@ -57,6 +57,8 @@ fn main() {
 
     mk_file("bbb/specials/[", false);
     mk_file("bbb/specials/]", false);
+    mk_file("bbb/specials/[something here]", true);
+    mk_file("bbb/specials/[something here]/a", false);
     mk_file("ccc", true);
     mk_file("xyz", true);
     mk_file("xyz/x", false);
@@ -374,4 +376,17 @@ fn main() {
             )
         );
     }
+
+    // Escaping
+    assert_eq!(
+        glob_vec("bbb/specials/\\[something here\\]/*"),
+        vec!(
+            PathBuf::from("bbb/specials/[something here]/a"),
+        )
+    );
+
+    assert_eq!(
+        glob_vec("bbb/specials/\\[something here\\]/\\*"),
+        Vec::<PathBuf>::new()
+    );
 }
